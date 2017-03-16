@@ -14,7 +14,7 @@ if sys.argv[-1] == "publish":
     os.system("python setup.py sdist upload")
     sys.exit()
 
-required = ['stathat']
+required = ['requests==2.13.0']
 
 setup(
     name='stathat-async',

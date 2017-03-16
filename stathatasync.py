@@ -20,28 +20,38 @@ Enjoy!
 
 """
 
-import stathat
-from Queue import Queue
+import requests
+from queue import Queue
 from threading import Thread
 
+STATHAT_API="http://api.stathat.com/ez"
 
-def worker(email, queue):
-    stats = stathat.StatHat(email)
+
+def worker(email, session, queue):
 
     while True:
         command, key, value = queue.get()
         if command == 'value':
-            stats.value(key, value)
+            session.post(url=STATHAT_API, data={
+                "ezkey": email,
+                "stat": key,
+                "value": value
+            })
         if command == 'count':
-            stats.count(key, value)
+            session.post(url=STATHAT_API, data={
+                "ezkey": email,
+                "stat": key,
+                "count": value
+            })
         queue.task_done()
 
 
 class StatHat(object):
 
     def __init__(self, email):
+        session = requests.session()
         self.queue = Queue()
-        thread = Thread(target=worker, args=(email, self.queue))
+        thread = Thread(target=worker, args=(email, session, self.queue))
         thread.daemon = True
         thread.start()
 
